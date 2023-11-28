@@ -42,3 +42,19 @@ func InsertOneDoc(db *mongo.Database, collection string, doc interface{}) (inser
 	}
 	return insertResult.InsertedID
 }
+
+func GetOneAdmin(MongoConn *mongo.Database, colname string, emaildata Admin) Admin {
+	filter := bson.M{"email": emaildata.Email}
+	data := atdb.GetOneDoc[Admin](MongoConn, colname, filter)
+	return data
+}
+
+func CompareEmail(MongoConn *mongo.Database, Colname, email string) bool {
+	filter := bson.M{"email": email}
+	err := atdb.GetOneDoc[Admin](MongoConn, Colname, filter)
+	admins := err.Email
+	if admins == "" {
+		return false
+	}
+	return true
+}
