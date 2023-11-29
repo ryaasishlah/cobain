@@ -15,9 +15,9 @@ func CompareHashPass(password, hash string) bool {
 	return err == nil
 }
 
-func TokenEncoder(username, privatekey string) string {
+func TokenEncoder(email, privatekey string) string {
 	resp := new(ResponseEncode)
-	encode, err := watoken.Encode(username, privatekey)
+	encode, err := watoken.Encode(email, privatekey)
 	if err != nil {
 		resp.Message = "Gagal Encode" + err.Error()
 	} else {

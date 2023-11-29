@@ -43,8 +43,8 @@ func InsertOneDoc(db *mongo.Database, collection string, doc interface{}) (inser
 	return insertResult.InsertedID
 }
 
-func GetOneAdmin(MongoConn *mongo.Database, colname string, emaildata Admin) Admin {
-	filter := bson.M{"email": emaildata.Email}
+func GetOneAdmin(MongoConn *mongo.Database, colname string, admindata Admin) Admin {
+	filter := bson.M{"email": admindata.Email}
 	data := atdb.GetOneDoc[Admin](MongoConn, colname, filter)
 	return data
 }

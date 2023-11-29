@@ -8,8 +8,6 @@ type Admin struct {
 	Email    string `bson:"email,omitempty" json:"email,omitempty"`
 	Password string `json:"password" bson:"password"`
 	Role     string `json:"role,omitempty" bson:"role,omitempty"`
-	Private  string `json:"private,omitempty" bson:"private,omitempty"`
-	Public   string `json:"public,omitempty" bson:"public,omitempty"`
 }
 
 type Credential struct {
@@ -42,11 +40,11 @@ type ResponseCatalogBanyak struct {
 }
 
 type Catalog struct {
-	CatalogId   string `json:"employeeid" bson:"employeeid,omitempty"`
+	CatalogId   int    `json:"employeeid" bson:"employeeid,omitempty"`
 	Title       string `json:"title" bson:"title"`
 	Description string `json:"description" bson:"description"`
 	Image       string `json:"image" bson:"image"`
-	Status      bool   `json:"status" bson:"status"`
+	Status      string `json:"status" bson:"status"`
 	Account     Admin  `json:"account" bson:"account,omitempty"`
 }
 
