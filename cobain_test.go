@@ -67,9 +67,9 @@ func TestTokenEncoder(t *testing.T) {
 
 func TestInsertAdmindata(t *testing.T) {
 	conn := MongoCreateConnection("MONGOSTRING", "Coba")
-	password, err := HashPass("iyasganteng")
+	password, err := HashPass("bebas")
 	fmt.Println("err", err)
-	data := InsertAdmindata(conn, "iyas", "role", password)
+	data := InsertAdmindata(conn, "coba@gmail.com", "role", password)
 	fmt.Println(data)
 }
 
