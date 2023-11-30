@@ -20,6 +20,24 @@ func SetConnection(MONGOCONNSTRINGENV, dbname string) *mongo.Database {
 	return atdb.MongoConnect(DBmongoinfo)
 }
 
+func InsertAdmindata(MongoConn *mongo.Database, email, role, password string) (InsertedID interface{}) {
+	req := new(Admin)
+	req.Email = email
+	req.Password = password
+	req.Role = role
+	return InsertOneDoc(MongoConn, "admin", req)
+}
+
+func DeleteAdmin(mongoconn *mongo.Database, collection string, admindata Admin) interface{} {
+	filter := bson.M{"email": admindata.Email}
+	return atdb.DeleteOneDoc(mongoconn, collection, filter)
+}
+
+func FindAdmin(mongoconn *mongo.Database, collection string, admindata Admin) Admin {
+	filter := bson.M{"email": admindata.Email}
+	return atdb.GetOneDoc[Admin](mongoconn, collection, filter)
+}
+
 func IsPasswordValid(mongoconn *mongo.Database, collection string, admindata Admin) bool {
 	filter := bson.M{"email": admindata.Email}
 	res := atdb.GetOneDoc[Admin](mongoconn, collection, filter)
@@ -47,14 +65,4 @@ func GetOneAdmin(MongoConn *mongo.Database, colname string, admindata Admin) Adm
 	filter := bson.M{"email": admindata.Email}
 	data := atdb.GetOneDoc[Admin](MongoConn, colname, filter)
 	return data
-}
-
-func CompareEmail(MongoConn *mongo.Database, Colname, email string) bool {
-	filter := bson.M{"email": email}
-	err := atdb.GetOneDoc[Admin](MongoConn, Colname, filter)
-	admins := err.Email
-	if admins == "" {
-		return false
-	}
-	return true
 }

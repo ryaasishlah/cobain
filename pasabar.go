@@ -1,35 +1,94 @@
 package cobain
 
 import (
-	"context"
 	"fmt"
+	"os"
 
+	"github.com/aiteung/atdb"
+	"github.com/whatsauth/watoken"
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
-// catalog
-func InsertDataCatalog(MongoConn *mongo.Database, colname string, cat Catalog) (InsertedID interface{}) {
-	req := new(Catalog)
-	req.CatalogId = cat.CatalogId
-	req.Title = cat.Title
-	req.Description = cat.Description
-	req.Image = cat.Image
-	req.Status = cat.Status
-	return InsertOneDoc(MongoConn, colname, req)
-}
-
-func InsertAdmindata(MongoConn *mongo.Database, email, role, password string) (InsertedID interface{}) {
-	req := new(Admin)
-	req.Email = email
-	req.Password = password
-	req.Role = role
-	return InsertSatuDoc(MongoConn, "admin", req)
-}
-
-func InsertSatuDoc(db *mongo.Database, collection string, doc interface{}) (insertedID interface{}) {
-	insertResult, err := db.Collection(collection).InsertOne(context.TODO(), doc)
+func CreateNewAdminRole(mongoconn *mongo.Database, collection string, admindata Admin) interface{} {
+	// Hash the password before storing it
+	hashedPassword, err := HashPass(admindata.Password)
 	if err != nil {
-		fmt.Printf("InsertOneDoc: %v\n", err)
+		return err
 	}
-	return insertResult.InsertedID
+	admindata.Password = hashedPassword
+
+	// Insert the admin data into the database
+	return atdb.InsertOneDoc(mongoconn, collection, admindata)
+}
+
+func CreateAdminAndAddToken(privateKeyEnv string, mongoconn *mongo.Database, collection string, admindata Admin) error {
+	// Hash the password before storing it
+	hashedPassword, err := HashPass(admindata.Password)
+	if err != nil {
+		return err
+	}
+	admindata.Password = hashedPassword
+
+	// Create a token for the admin
+	tokenstring, err := watoken.Encode(admindata.Email, os.Getenv(privateKeyEnv))
+	if err != nil {
+		return err
+	}
+
+	admindata.Token = tokenstring
+
+	// Insert the admin data into the MongoDB collection
+	if err := atdb.InsertOneDoc(mongoconn, collection, admindata.Email); err != nil {
+		return nil // Mengembalikan kesalahan yang dikembalikan oleh atdb.InsertOneDoc
+	}
+
+	// Return nil to indicate success
+	return nil
+}
+
+func CreateResponse(status bool, message string, data interface{}) Response {
+	response := Response{
+		Status:  status,
+		Message: message,
+		Data:    data,
+	}
+	return response
+}
+
+func CreateAdmin(mongoconn *mongo.Database, collection string, admindata Admin) interface{} {
+	// Hash the password before storing it
+	hashedPassword, err := HashPass(admindata.Password)
+	if err != nil {
+		return err
+	}
+	privateKey, publicKey := watoken.GenerateKey()
+	adminid := admindata.Email
+	tokenstring, err := watoken.Encode(adminid, privateKey)
+	if err != nil {
+		fmt.Println(err)
+	}
+	fmt.Println(tokenstring)
+	// decode token to get adminid
+	adminidstring := watoken.DecodeGetId(publicKey, tokenstring)
+	if adminidstring == "" {
+		fmt.Println("expire token")
+	}
+	fmt.Println(adminidstring)
+	admindata.Private = privateKey
+	admindata.Public = publicKey
+	admindata.Password = hashedPassword
+
+	// Insert the admin data into the database
+	return atdb.InsertOneDoc(mongoconn, collection, admindata)
+}
+
+func GetAllCatalog(mongoconn *mongo.Database, collection string) []Catalog {
+	catalog := atdb.GetAllDoc[[]Catalog](mongoconn, collection)
+	return catalog
+}
+
+//catalog
+
+func CreateNewCatalog(mongoconn *mongo.Database, collection string, catalogdata Catalog) interface{} {
+	return atdb.InsertOneDoc(mongoconn, collection, catalogdata)
 }
