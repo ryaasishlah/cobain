@@ -3,6 +3,7 @@ package cobain
 import (
 	"fmt"
 	"testing"
+	"time"
 
 	"github.com/aiteung/atdb"
 	"github.com/whatsauth/watoken"
@@ -110,4 +111,27 @@ func TestLoginn(t *testing.T) {
 	admindata.Password = "mantap"
 	IsPasswordValid(mconn, "admin", admindata)
 	fmt.Println(admindata)
+}
+
+func TestInsertOtp(t *testing.T) {
+	table := MongoCreateConnection("MONGOSTRING", "psbapk")
+	data := OTP{
+		Email:   "ryaasishlah@gmail.com",
+		DateOTP: time.Now(),
+		OTPCode: CreateOTP(),
+	}
+	ins := InsertOtp(table, "otp", data)
+	fmt.Printf("result : %s", ins)
+}
+
+func TestInsertAdmindata(t *testing.T) {
+	table := MongoCreateConnection("MONGOSTRING", "psbapk")
+	data := Admins{
+		Email:    "ryaasishlah@gmail.com",
+		Password: "iyasganteng",
+		PhoneNum: "mantap",
+		Role:     "admin",
+	}
+	ins := InsertAdminsdata(table, data)
+	fmt.Printf("result : %s", ins)
 }

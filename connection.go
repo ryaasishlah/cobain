@@ -28,6 +28,10 @@ func InsertAdmindata(MongoConn *mongo.Database, email, role, password string) (I
 	return InsertOneDoc(MongoConn, "admin", req)
 }
 
+func InsertAdminsdata(MongoConn *mongo.Database, admin Admins) (InsertedID interface{}) {
+	return InsertOneDoc(MongoConn, "admin", admin)
+}
+
 func DeleteAdmin(mongoconn *mongo.Database, collection string, admindata Admin) interface{} {
 	filter := bson.M{"email": admindata.Email}
 	return atdb.DeleteOneDoc(mongoconn, collection, filter)
