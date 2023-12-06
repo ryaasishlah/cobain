@@ -51,22 +51,6 @@ func TestGFCPostHandlerAdmin(t *testing.T) {
 	CreateNewAdminRole(mconn, "admin", admindata)
 }
 
-func TestCatalog(t *testing.T) {
-	mconn := SetConnection("MONGOSTRING", "psbapk")
-	var catalogdata Catalog
-	catalogdata.Nomorid = 1
-	catalogdata.Title = "garut"
-	catalogdata.Description = "keren banget"
-	catalogdata.Image = "https://images3.alphacoders.com/165/thumb-1920-165265.jpg"
-	CreateNewCatalog(mconn, "catalog", catalogdata)
-}
-
-func TestAllCatalog(t *testing.T) {
-	mconn := SetConnection("MONGOSTRING", "psbapk")
-	catalog := GetAllCatalog(mconn, "catalog")
-	fmt.Println(catalog)
-}
-
 func TestGeneratePasswordHash(t *testing.T) {
 	password := "ganteng"
 	hash, _ := HashPass(password) // ignore error for the sake of simplicity

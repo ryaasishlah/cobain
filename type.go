@@ -2,8 +2,6 @@ package cobain
 
 import (
 	"time"
-
-	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 type Admin struct {
@@ -35,11 +33,20 @@ type Payload struct {
 	Nbf  time.Time `json:"nbf"`
 }
 
-type Catalog struct {
-	ID          primitive.ObjectID `bson:"_id,omitempty" `
-	Nomorid     int                `json:"nomorid" bson:"nomorid"`
-	Title       string             `json:"title" bson:"title"`
-	Description string             `json:"description" bson:"description"`
-	Image       string             `json:"image" bson:"image"`
-	Status      bool               `json:"status" bson:"status"`
+type Responses struct {
+	Response string `bson:"response" json:"response"`
+}
+
+type Admins struct {
+	Email    string `json:"email" bson:"email"`
+	Password string `json:"password" bson:"password"`
+	PhoneNum string `json:"phone-num" bson:"phone-num"`
+	Role     string `json:"role,omitempty" bson:"role,omitempty"`
+}
+
+type OTP struct {
+	Email   string    `json:"email" bson:"email"`
+	Role    string    `bson:"role" json:"role"`
+	DateOTP time.Time `json:"date-otp" bson:"date-otp"`
+	OTPCode string    `bson:"otp-code" json:"otp-code"`
 }

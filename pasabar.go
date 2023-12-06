@@ -82,13 +82,6 @@ func CreateAdmin(mongoconn *mongo.Database, collection string, admindata Admin) 
 	return atdb.InsertOneDoc(mongoconn, collection, admindata)
 }
 
-func GetAllCatalog(mongoconn *mongo.Database, collection string) []Catalog {
-	catalog := atdb.GetAllDoc[[]Catalog](mongoconn, collection)
-	return catalog
-}
-
-//catalog
-
-func CreateNewCatalog(mongoconn *mongo.Database, collection string, catalogdata Catalog) interface{} {
-	return atdb.InsertOneDoc(mongoconn, collection, catalogdata)
+func InsertOtp(MongoConn *mongo.Database, colname string, otp OTP) (InsertedID interface{}) {
+	return InsertOneDoc(MongoConn, colname, otp)
 }

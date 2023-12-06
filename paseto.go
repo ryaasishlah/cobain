@@ -4,49 +4,12 @@ import (
 	"encoding/json"
 	"net/http"
 	"os"
+	"time"
 
+	"github.com/aiteung/atapi"
+	"github.com/whatsauth/wa"
 	"github.com/whatsauth/watoken"
 )
-
-func GCFCreateCatalog(publickey, MONGOCONNSTRINGENV, dbname, colladmin, collcatalog string, r *http.Request) string {
-	var response Credential
-	response.Status = false
-	mconn := SetConnection(MONGOCONNSTRINGENV, dbname)
-	var admindata Admin
-	gettoken := r.Header.Get("token")
-	if gettoken == "" {
-		response.Message = "Missing token in headers"
-	} else {
-		// Process the request with the "Login" token
-		checktoken := watoken.DecodeGetId(os.Getenv(publickey), gettoken)
-		admindata.Email = checktoken
-		if checktoken == "" {
-			response.Message = "Invalid token"
-		} else {
-			admin2 := FindAdmin(mconn, colladmin, admindata)
-			if admin2.Role == "admin" {
-				var datacatalog Catalog
-				err := json.NewDecoder(r.Body).Decode(&datacatalog)
-				if err != nil {
-					response.Message = "Error parsing application/json: " + err.Error()
-				} else {
-					CreateNewCatalog(mconn, collcatalog, Catalog{
-						Nomorid:     datacatalog.Nomorid,
-						Title:       datacatalog.Title,
-						Description: datacatalog.Description,
-						Image:       datacatalog.Image,
-						Status:      datacatalog.Status,
-					})
-					response.Status = true
-					response.Message = "Catalog creation successful"
-				}
-			} else {
-				response.Message = "ANDA BUKAN ADMIN"
-			}
-		}
-	}
-	return GCFReturnStruct(response)
-}
 
 func Login(Privatekey, MongoEnv, dbname, Colname string, r *http.Request) string {
 	var resp Credential
@@ -69,10 +32,49 @@ func Login(Privatekey, MongoEnv, dbname, Colname string, r *http.Request) string
 			resp.Message = "Password Salah"
 		}
 	}
-	return GCFReturnStruct(resp)
+	return ReturnStringStruct(resp)
 }
 
-func GCFReturnStruct(DataStuct any) string {
-	jsondata, _ := json.Marshal(DataStuct)
-	return string(jsondata)
+func ReturnStringStruct(Data any) string {
+	json, _ := json.Marshal(Data)
+	return string(json)
+}
+
+func LoginOTP(MongoEnv, dbname, Colname string, r *http.Request) string {
+	var resp Credential
+	mconn := MongoCreateConnection(MongoEnv, dbname)
+	var dataadmin Admins
+	err := json.NewDecoder(r.Body).Decode(&dataadmin)
+	if r.Header.Get("Secret") == os.Getenv("SECRET") {
+		if err != nil {
+			resp.Message = "error parsing application/json: " + err.Error()
+		} else {
+			if PasswordValidator(mconn, Colname, Admin{
+				Email:    dataadmin.Email,
+				Password: dataadmin.Password,
+				Role:     dataadmin.Role,
+			}) {
+				datarole := GetOneAdmin(mconn, "admin", Admins{Email: dataadmin.Email})
+				data := OTP{
+					Email:   dataadmin.Email,
+					Role:    datarole.Role,
+					DateOTP: time.Now(),
+					OTPCode: CreateOTP(),
+				}
+				InsertOtp(mconn, "otp", data)
+				dt := &wa.TextMessage{
+					To:       datarole.PhoneNum,
+					IsGroup:  false,
+					Messages: "Hai hai kak \n Ini OTP kakak " + data.OTPCode,
+				}
+				res, _ := atapi.PostStructWithToken[Responses]("Token", os.Getenv("TOKEN"), dt, "https://api.wa.my.id/api/send/message/text")
+				resp.Status = true
+				resp.Message = "Hai Silahkan cek WhatsApp untuk OTPnya yaa"
+				resp.Token = res.Response
+			} else {
+				resp.Message = "Password Salah"
+			}
+		}
+	}
+	return ReturnStringStruct(resp)
 }
