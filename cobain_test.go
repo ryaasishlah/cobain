@@ -128,8 +128,8 @@ func TestInsertAdmindata(t *testing.T) {
 	table := MongoCreateConnection("MONGOSTRING", "psbapk")
 	data := Admins{
 		Email:    "ryaasishlah@gmail.com",
-		Password: "iyasganteng",
-		PhoneNum: "mantap",
+		Password: "mantap",
+		PhoneNum: "6282126665837",
 		Role:     "admin",
 	}
 	ins := InsertAdminsdata(table, data)
