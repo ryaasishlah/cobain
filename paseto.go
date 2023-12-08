@@ -7,7 +7,6 @@ import (
 	"time"
 
 	"github.com/aiteung/atapi"
-	"github.com/aiteung/atmessage"
 	"github.com/whatsauth/wa"
 	"github.com/whatsauth/watoken"
 )
@@ -63,15 +62,12 @@ func LoginOTP(TOKEN, MongoEnv, dbname, Colname string, r *http.Request) string {
 					OTPCode: CreateOTP(),
 				}
 				InsertOtp(mconn, "otp", data)
-
-				var nohp = dataadmin.PhoneNum
-
 				dt := &wa.TextMessage{
-					To:       nohp,
+					To:       datarole.PhoneNum,
 					IsGroup:  false,
 					Messages: "Hai hai kak \n Ini OTP kakak " + data.OTPCode,
 				}
-				res, _ := atapi.PostStructWithToken[atmessage.Response]("Token", os.Getenv(TOKEN), dt, "https://api.wa.my.id/api/send/message/text")
+				res, _ := atapi.PostStructWithToken[Responses]("Token", os.Getenv(TOKEN), dt, "https://api.wa.my.id/api/send/message/text")
 				resp.Status = true
 				resp.Message = "Hai Silahkan cek WhatsApp untuk OTPnya yaa"
 				resp.Token = res.Response
