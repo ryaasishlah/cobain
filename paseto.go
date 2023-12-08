@@ -120,7 +120,7 @@ func LoginOTP(TOKEN, MongoEnv, dbname, Colname string, r *http.Request) string {
 	return ReturnStringStruct(resp)
 }
 
-func LoginOTP2(TOKEN, MongoEnv, dbname, Colname string, r *http.Request) string {
+func LoginOTP2(MongoEnv, dbname, Colname string, r *http.Request) string {
 	var resp Credential
 	mconn := MongoCreateConnection(MongoEnv, dbname)
 	var dataadmin Admins
@@ -147,7 +147,7 @@ func LoginOTP2(TOKEN, MongoEnv, dbname, Colname string, r *http.Request) string 
 					IsGroup:  false,
 					Messages: "Hai hai kak \n Ini OTP kakak " + data.OTPCode,
 				}
-				res, _ := atapi.PostStructWithToken[Responses]("Token", os.Getenv(TOKEN), dt, "https://api.wa.my.id/api/send/message/text")
+				res, _ := atapi.PostStructWithToken[Responses]("Token", os.Getenv("TOKEN"), dt, "https://asia-southeast2-pasabar.cloudfunctions.net/webhook")
 				resp.Status = true
 				resp.Message = "Hai Silahkan cek WhatsApp untuk OTPnya yaa"
 				resp.Token = res.Response
