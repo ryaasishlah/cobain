@@ -63,8 +63,11 @@ func LoginOTP(TOKEN, MongoEnv, dbname, Colname string, r *http.Request) string {
 					OTPCode: CreateOTP(),
 				}
 				InsertOtp(mconn, "otp", data)
+
+				var nohp = dataadmin.PhoneNum
+
 				dt := &wa.TextMessage{
-					To:       datarole.PhoneNum,
+					To:       nohp,
 					IsGroup:  false,
 					Messages: "Hai hai kak \n Ini OTP kakak " + data.OTPCode,
 				}
