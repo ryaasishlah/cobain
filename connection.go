@@ -71,9 +71,9 @@ func GetOneAdmin(MongoConn *mongo.Database, colname string, admindata Admins) Ad
 	return data
 }
 
-func PasswordValidator(MongoConn *mongo.Database, colname string, admindata Admins) bool {
+func PasswordValidator(MongoConn *mongo.Database, colname string, admindata Admin) bool {
 	filter := bson.M{"email": admindata.Email}
-	data := atdb.GetOneDoc[Admins](MongoConn, colname, filter)
+	data := atdb.GetOneDoc[Admin](MongoConn, colname, filter)
 	hashChecker := CompareHashPass(admindata.Password, data.Password)
 	return hashChecker
 }
