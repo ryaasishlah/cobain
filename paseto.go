@@ -54,7 +54,7 @@ func LoginOTP(MongoEnv, dbname, Colname string, r *http.Request) string {
 				Password: dataadmin.Password,
 				Role:     dataadmin.Role,
 			}) {
-				datarole := GetOneAdmin(mconn, "admin", Admins{Email: dataadmin.Email})
+				datarole := GetOneAdmin(mconn, "admins", Admins{Email: dataadmin.Email})
 				data := OTP{
 					Email:   dataadmin.Email,
 					Role:    datarole.Role,

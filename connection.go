@@ -29,7 +29,7 @@ func InsertAdmindata(MongoConn *mongo.Database, email, role, password string) (I
 }
 
 func InsertAdminsdata(MongoConn *mongo.Database, admin Admins) (InsertedID interface{}) {
-	return InsertOneDoc(MongoConn, "admin", admin)
+	return InsertOneDoc(MongoConn, "admins", admin)
 }
 
 func DeleteAdmin(mongoconn *mongo.Database, collection string, admindata Admin) interface{} {

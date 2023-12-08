@@ -114,9 +114,10 @@ func TestLoginn(t *testing.T) {
 }
 
 func TestInsertOtp(t *testing.T) {
-	table := MongoCreateConnection("MONGOSTRING", "psbapk")
+	table := SetConnection("MONGOSTRING", "psbapk")
 	data := OTP{
-		Email:   "ryaasishlah@gmail.com",
+		Email:   "ryaasishlah123@gmail.com",
+		Role:    "admin",
 		DateOTP: time.Now(),
 		OTPCode: CreateOTP(),
 	}
@@ -125,10 +126,10 @@ func TestInsertOtp(t *testing.T) {
 }
 
 func TestInsertAdmindata(t *testing.T) {
-	table := MongoCreateConnection("MONGOSTRING", "psbapk")
+	table := SetConnection("MONGOSTRING", "psbapk")
 	data := Admins{
-		Email:    "ryaasishlah@gmail.com",
-		Password: "mantap",
+		Email:    "ryaasishlah123@gmail.com",
+		Password: "hebat",
 		PhoneNum: "6282126665837",
 		Role:     "admin",
 	}
