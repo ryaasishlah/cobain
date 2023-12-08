@@ -29,7 +29,7 @@ func InsertAdmindata(MongoConn *mongo.Database, email, role, password string) (I
 }
 
 func InsertAdminsdata(MongoConn *mongo.Database, admin Admins) (InsertedID interface{}) {
-	return InsertOneDoc(MongoConn, "admins", admin)
+	return InsertOneDoc(MongoConn, "admin", admin)
 }
 
 func DeleteAdmin(mongoconn *mongo.Database, collection string, admindata Admin) interface{} {
@@ -71,9 +71,9 @@ func GetOneAdmin(MongoConn *mongo.Database, colname string, admindata Admins) Ad
 	return data
 }
 
-func PasswordValidator(MongoConn *mongo.Database, colname string, admindata Admin) bool {
+func PasswordValidator(MongoConn *mongo.Database, colname string, admindata Admins) bool {
 	filter := bson.M{"email": admindata.Email}
-	data := atdb.GetOneDoc[Admin](MongoConn, colname, filter)
+	data := atdb.GetOneDoc[Admins](MongoConn, colname, filter)
 	hashChecker := CompareHashPass(admindata.Password, data.Password)
 	return hashChecker
 }

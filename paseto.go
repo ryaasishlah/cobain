@@ -50,12 +50,12 @@ func LoginOTP(token, MongoEnv, dbname, Colname string, r *http.Request) string {
 		if err != nil {
 			resp.Message = "error parsing application/json: " + err.Error()
 		} else {
-			if PasswordValidator(mconn, Colname, Admin{
+			if PasswordValidator(mconn, Colname, Admins{
 				Email:    dataadmin.Email,
 				Password: dataadmin.Password,
 				Role:     dataadmin.Role,
 			}) {
-				datarole := GetOneAdmin(mconn, "admins", Admins{Email: dataadmin.Email})
+				datarole := GetOneAdmin(mconn, "admin", Admins{Email: dataadmin.Email})
 				data := OTP{
 					Email:   dataadmin.Email,
 					Role:    datarole.Role,
