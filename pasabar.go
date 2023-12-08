@@ -1,11 +1,13 @@
 package cobain
 
 import (
+	"context"
 	"fmt"
 	"os"
 
 	"github.com/aiteung/atdb"
 	"github.com/whatsauth/watoken"
+	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
@@ -84,4 +86,13 @@ func CreateAdmin(mongoconn *mongo.Database, collection string, admindata Admin) 
 
 func InsertOtp(MongoConn *mongo.Database, colname string, otp OTP) (InsertedID interface{}) {
 	return InsertOneDoc(MongoConn, colname, otp)
+}
+
+func emailExists(mongoenv, dbname string, admindata Admin) bool {
+	mconn := SetConnection(mongoenv, dbname).Collection("admin")
+	filter := bson.M{"email": admindata.Email}
+
+	var admin Admin
+	err := mconn.FindOne(context.Background(), filter).Decode(&admin)
+	return err == nil
 }
