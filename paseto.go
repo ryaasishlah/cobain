@@ -52,7 +52,42 @@ func GCFReturnStruct(DataStuct any) string {
 	return string(jsondata)
 }
 
-func Login(Privatekey, MongoEnv, dbname, Colname string, r *http.Request) string {
+func Login(token, Privatekey, MongoEnv, dbname, Colname string, r *http.Request) string {
+	var resp Credential
+	mconn := SetConnection(MongoEnv, dbname)
+	var dataadmin Admin
+	err := json.NewDecoder(r.Body).Decode(&dataadmin)
+	if err != nil {
+		resp.Message = "error parsing application/json: " + err.Error()
+	} else {
+		if IsPasswordValid(mconn, Colname, dataadmin) {
+			tokenstring, err := watoken.Encode(dataadmin.Email, os.Getenv(Privatekey))
+			if err != nil {
+				resp.Message = "Gagal Encode Token : " + err.Error()
+			} else {
+				resp.Status = true
+				resp.Message = "Selamat Datang SUPERADMIN"
+				resp.Token = tokenstring
+			}
+
+			var email = dataadmin.Email
+			var nohp = dataadmin.No_whatsapp
+
+			dt := &wa.TextMessage{
+				To:       nohp,
+				IsGroup:  false,
+				Messages: "Selamat datang Admin PASABAR anda berhasil Login, anda masuk menggunakan: " + email + "\n Selamat menggunakanya ya",
+			}
+
+			atapi.PostStructWithToken[atmessage.Response]("Token", os.Getenv(token), dt, "https://api.wa.my.id/api/send/message/text")
+		} else {
+			resp.Message = "Password Salah"
+		}
+	}
+	return ReturnStringStruct(resp)
+}
+
+func LoginBaru(Privatekey, MongoEnv, dbname, Colname string, r *http.Request) string {
 	var resp Credential
 	mconn := SetConnection(MongoEnv, dbname)
 	var dataadmin Admin
@@ -90,7 +125,7 @@ func LoginOTP(TOKEN, MongoEnv, dbname, Colname string, r *http.Request) string {
 		if err != nil {
 			resp.Message = "error parsing application/json: " + err.Error()
 		} else {
-			if PasswordValidator(mconn, Colname, Admin{
+			if IsPasswordValid(mconn, Colname, Admin{
 				Email:    dataadmin.Email,
 				Password: dataadmin.Password,
 				Role:     dataadmin.Role,

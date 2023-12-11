@@ -42,6 +42,11 @@ func FindAdmin(mongoconn *mongo.Database, collection string, admindata Admin) Ad
 	return atdb.GetOneDoc[Admin](mongoconn, collection, filter)
 }
 
+func FindAdmins(mongoconn *mongo.Database, collection string, admindata Admins) Admins {
+	filter := bson.M{"email": admindata.Email}
+	return atdb.GetOneDoc[Admins](mongoconn, collection, filter)
+}
+
 func IsPasswordValid(mongoconn *mongo.Database, collection string, admindata Admin) bool {
 	filter := bson.M{"email": admindata.Email}
 	res := atdb.GetOneDoc[Admin](mongoconn, collection, filter)
